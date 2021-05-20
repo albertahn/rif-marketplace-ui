@@ -95,18 +95,18 @@ const NotificationEventCreate: FC<Props> = ({
 
   const canAddEvent = (): boolean => (eventData?.addedChannels !== undefined
         && eventData.addedChannels.length > 0
-        && eventData.event !== undefined) as boolean
+        && (eventData.eventType === 'NEWBLOCK' as SupportedEvent || eventData.event !== undefined)) as boolean
 
   const handleAddEvent = (data: Inputs): void => {
     if (eventData?.addedChannels !== undefined
         && eventData.addedChannels.length > 0
-        && eventData.event !== undefined) {
+        && (eventData.eventType === 'NEWBLOCK' as SupportedEvent || eventData.event !== undefined)) {
       onAddEvent({
         smartContract: data.contract,
-        name: eventData.event.name,
-        channels: eventData.addedChannels,
-        type: eventData.eventType as SupportedEvent,
-        params: eventData.event.inputs as Array<NotifierEventParam>,
+        name: eventData?.event?.name,
+        channels: eventData?.addedChannels,
+        type: eventData?.eventType as SupportedEvent,
+        params: eventData?.event?.inputs as Array<NotifierEventParam>,
       })
       setEventData({ eventType: 'SMARTCONTRACT' as SupportedEvent })
     }
@@ -137,67 +137,64 @@ const NotificationEventCreate: FC<Props> = ({
             </Select>
           </GridItem>
         </GridRow>
-        <GridRow spacing={4} className={classes.gridRow}>
-          <GridItem>
-            <Typography gutterBottom color="secondary" variant="body2">
-              Smart Contract
-            </Typography>
-          </GridItem>
-          <GridItem>
-            <TextField
-              name="contract"
-              inputRef={register({ required: true })}
-              onChange={handleContractChange}
-              variant="outlined"
-              InputProps={{
-                style: { width: 400, height: 40 },
-              }}
-            />
-            {
-                errors.contract && (
-                <Typography color="error" variant="caption">
-                  Invalid Contract Address
-                </Typography>
-                )
-              }
-          </GridItem>
-        </GridRow>
-        <GridRow spacing={5} className={classes.gridRow}>
-          <GridItem>
-            <Typography gutterBottom color="secondary" variant="body2">
-              Event
-            </Typography>
-          </GridItem>
-          <GridItem>
-            <Box pl={7}>
-              <Select
-                name="eventName"
-                onChange={handleEventChange}
-                value={eventData?.event?.name || (events.length ? events[0].name : '')}
-                className={classes.select}
-                id="event"
+        { eventData.eventType === 'SMARTCONTRACT' as SupportedEvent && (
+        <>
+          <GridRow spacing={4} className={classes.gridRow}>
+            <GridItem>
+              <Typography gutterBottom color="secondary" variant="body2">
+                Smart Contract
+              </Typography>
+            </GridItem>
+            <GridItem>
+              <TextField
+                name="contract"
+                inputRef={register({ required: true })}
+                onChange={handleContractChange}
                 variant="outlined"
-              >
-                {
-                  events.map((event) => <MenuItem key={event.name} value={event.name}>{event.name}</MenuItem>)
-                }
-              </Select>
-            </Box>
-          </GridItem>
-        </GridRow>
+                InputProps={{
+                  style: { width: 400, height: 40 },
+                }}
+              />
+              {
+              errors.contract && (
+              <Typography color="error" variant="caption">
+                Invalid Contract Address
+              </Typography>
+              )
+            }
+            </GridItem>
+          </GridRow>
+          <GridRow spacing={5} className={classes.gridRow}>
+            <GridItem>
+              <Typography gutterBottom color="secondary" variant="body2">
+                Event
+              </Typography>
+            </GridItem>
+            <GridItem>
+              <Box pl={7}>
+                <Select
+                  name="eventName"
+                  onChange={handleEventChange}
+                  value={eventData?.event?.name || (events.length ? events[0].name : '')}
+                  className={classes.select}
+                  id="event"
+                  variant="outlined"
+                >
+                  {
+          events.map((event) => <MenuItem key={event.name} value={event.name}>{event.name}</MenuItem>)
+        }
+                </Select>
+              </Box>
+            </GridItem>
+          </GridRow>
+        </>
+        )}
       </Grid>
       <Grid>
         <Box mt={4}>
           <NotificationChannelsList channels={channels} onEventChannelsUpdate={handleAddChannels} />
         </Box>
         <GridRow justify="center" spacing={2}>
-          {
-                eventData?.contract && !eventData?.addedChannels?.length && (
-                <Typography color="error" variant="caption">
-                  Atleast one notification channel must be added
-                </Typography>
-                )
-            }
           <RoundBtn disabled={!canAddEvent()} onClick={handleSubmit(handleAddEvent)}>
             Submit
           </RoundBtn>

@@ -20,6 +20,7 @@ import { createStyles, Theme } from '@material-ui/core/styles'
 import NotificationEventCreate from 'components/organisms/notifier/NotificationEventCreate'
 import { NotifierEvent, NotifierEventParam } from 'models/marketItems/NotifierItem'
 import Box from '@material-ui/core/Box'
+import { SupportedEvent } from 'config/notifier'
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
 
@@ -65,14 +66,19 @@ const NotifierOffersSelectedPage: FC = () => {
 
   const [events, setEvents] = useState<Array<EventItem>>([])
   const [addEventCollapsed, setAddEventCollapsed] = useState<boolean>(false)
+  const [key, setKey] = useState<number>(0)
 
   const addNotifierEvent = (notifierEvent: NotifierEvent): void => {
+    if (notifierEvent.type === 'NEWBLOCK' as SupportedEvent && events.find((addedEvent) => addedEvent.type === 'NEWBLOCK' as SupportedEvent)) {
+      setAddEventCollapsed(!addEventCollapsed)
+      return
+    }
     setEvents([
       ...events, {
         // id: notifierEvent.name as string,
-        name: notifierEvent.name as string,
+        name: notifierEvent.type === 'NEWBLOCK' as SupportedEvent ? 'NEWBLOCK' : notifierEvent.name as string,
         type: notifierEvent.type,
-        signature: buildEventSignature(notifierEvent) as string,
+        signature: notifierEvent.type === 'NEWBLOCK' as SupportedEvent ? '' : buildEventSignature(notifierEvent) as string,
         channels: notifierEvent.channels.map((channel) => channel.type).join('+'),
       },
     ])
@@ -119,6 +125,7 @@ const NotifierOffersSelectedPage: FC = () => {
       <Button
         onClick={() => {
           setAddEventCollapsed(!addEventCollapsed)
+          setKey(key + 1)
         }}
         variant="outlined"
         color="primary"
@@ -130,7 +137,7 @@ const NotifierOffersSelectedPage: FC = () => {
       <br />
       <Collapse in={addEventCollapsed}>
         <Box mt={6}>
-          <NotificationEventCreate onAddEvent={addNotifierEvent} channels={order?.item.channels} />
+          <NotificationEventCreate key={key} onAddEvent={addNotifierEvent} channels={order?.item.channels} />
         </Box>
       </Collapse>
     </CenteredPageTemplate>
