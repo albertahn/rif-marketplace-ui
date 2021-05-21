@@ -8,6 +8,7 @@ import RoundBtn from 'components/atoms/RoundBtn'
 import { SYSTEM_SUPPORTED_FIAT } from 'models/Fiat'
 import { QuotationPerToken } from 'models/Market'
 import MarketContext from 'context/Market'
+import Big from 'big.js'
 import CheckoutPayment from './CheckoutPayment'
 
 type Props = {
@@ -28,9 +29,10 @@ const CheckoutStepper: FC<Props> = ({ onBuy }) => {
   const handleBack = (): void => setActiveStep(0)
   // TODO: remove hardcoded
   const paymentOptions: QuotationPerToken = {
-    rif: '100',
-    rbtc: '0.001',
+    rif: Big('100'),
+    rbtc: Big('0.001'),
   }
+  const expirationDate = new Date(2022, 1, 1)
 
   return (
     <Stepper activeStep={activeStep} orientation="vertical">
@@ -54,7 +56,7 @@ const CheckoutStepper: FC<Props> = ({ onBuy }) => {
             onBuy={onBuy}
             paymentOptions={paymentOptions}
             fiatUnit={SYSTEM_SUPPORTED_FIAT.usd}
-            expirationDate="01/01/2022"
+            expirationDate={expirationDate}
             cryptoXRs={cryptoXRs}
           />
           <Button
