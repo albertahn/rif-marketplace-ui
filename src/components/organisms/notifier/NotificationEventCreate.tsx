@@ -8,7 +8,9 @@ import GridRow from 'components/atoms/GridRow'
 import { useForm } from 'react-hook-form'
 import GridItem from 'components/atoms/GridItem'
 import { notifierEventTypeLabels } from 'constants/notifier/strings'
-import { SUPPORTED_EVENTS, SupportedEvent, SupportedEventChannel } from 'config/notifier'
+import {
+  SUPPORTED_EVENTS, SupportedEventType, SupportedEventChannel, SUPPORTED_EVENT_TYPES,
+} from 'config/notifier'
 import NotificationChannelsList from 'components/organisms/notifier/NotificationChannelsList'
 import RoundBtn from 'components/atoms/RoundBtn'
 import { NotifierChannel, NotifierEvent, NotifierEventParam } from 'models/marketItems/NotifierItem'
@@ -32,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 type Inputs = {
-  contract: string
+    contract: string
 }
 
 type Props = {
@@ -41,10 +43,10 @@ type Props = {
 }
 
 type EventData = {
-  contract: string
-  event: ContractABIEvent
-  eventType: SupportedEvent
-  addedChannels: Array<NotifierChannel>
+    contract: string
+    event: ContractABIEvent
+    eventType: SupportedEventType
+    addedChannels: Array<NotifierChannel>
 }
 
 const NotificationEventCreate: FC<Props> = ({
@@ -53,7 +55,7 @@ const NotificationEventCreate: FC<Props> = ({
   const { register, handleSubmit, errors } = useForm<Inputs>()
   const [events, setEvents] = useState<Array<ContractABIEvent>>([])
   const [eventData, setEventData] = useState<Partial<EventData>>({
-    eventType: 'SMARTCONTRACT' as SupportedEvent,
+    eventType: SUPPORTED_EVENTS.SMARTCONTRACT,
   })
 
   const classes = useStyles()
@@ -77,7 +79,7 @@ const NotificationEventCreate: FC<Props> = ({
   }
 
   const handleEventChange = ({ target: { value } }) => {
-    setEventData({ ...eventData, event: events.filter((event) => event.name === value)[0] })
+    setEventData({ ...eventData, event: events.find(({ name }) => name === value) as ContractABIEvent })
   }
 
   const handleEventTypeChange = ({ target: { value } }) => {
@@ -93,22 +95,18 @@ const NotificationEventCreate: FC<Props> = ({
     setEventData({ ...eventData, addedChannels: selectedChannels })
   }
 
-  const canAddEvent = (): boolean => (eventData?.addedChannels !== undefined
-        && eventData.addedChannels.length > 0
-        && (eventData.eventType === 'NEWBLOCK' as SupportedEvent || eventData.event !== undefined)) as boolean
+  const canAddEvent = (): boolean => Boolean(eventData.addedChannels?.length && (eventData.eventType === SUPPORTED_EVENTS.NEWBLOCK || eventData.event))
 
   const handleAddEvent = (data: Inputs): void => {
-    if (eventData?.addedChannels !== undefined
-        && eventData.addedChannels.length > 0
-        && (eventData.eventType === 'NEWBLOCK' as SupportedEvent || eventData.event !== undefined)) {
+    if (eventData.addedChannels?.length && (eventData.eventType === SUPPORTED_EVENTS.NEWBLOCK || eventData.event)) {
       onAddEvent({
         smartContract: data.contract,
         name: eventData?.event?.name,
         channels: eventData?.addedChannels,
-        type: eventData?.eventType as SupportedEvent,
+        type: eventData?.eventType as SupportedEventType,
         params: eventData?.event?.inputs as Array<NotifierEventParam>,
       })
-      setEventData({ eventType: 'SMARTCONTRACT' as SupportedEvent })
+      setEventData({ eventType: SUPPORTED_EVENTS.SMARTCONTRACT })
     }
   }
 
@@ -126,18 +124,25 @@ const NotificationEventCreate: FC<Props> = ({
             <Select
               name="eventType"
               onChange={handleEventTypeChange}
-              value={eventData?.eventType ? eventData.eventType : (SUPPORTED_EVENTS.length ? SUPPORTED_EVENTS[0] : '')}
+              value={eventData?.eventType ?? SUPPORTED_EVENTS.SMARTCONTRACT}
               variant="outlined"
               className={classes.select}
               id="event-type-select"
             >
               {
-        SUPPORTED_EVENTS.map((eventType) => <MenuItem key={eventType} value={eventType}>{notifierEventTypeLabels[eventType]}</MenuItem>)
-      }
+                                SUPPORTED_EVENT_TYPES.map((eventType) => (
+                                  <MenuItem
+                                    key={eventType}
+                                    value={eventType}
+                                  >
+                                    {notifierEventTypeLabels[eventType]}
+                                  </MenuItem>
+                                ))
+                            }
             </Select>
           </GridItem>
         </GridRow>
-        { eventData.eventType === 'SMARTCONTRACT' as SupportedEvent && (
+        {eventData.eventType === SUPPORTED_EVENTS.SMARTCONTRACT && (
         <>
           <GridRow spacing={4} className={classes.gridRow}>
             <GridItem>
@@ -156,12 +161,12 @@ const NotificationEventCreate: FC<Props> = ({
                 }}
               />
               {
-              errors.contract && (
-              <Typography color="error" variant="caption">
-                Invalid Contract Address
-              </Typography>
-              )
-            }
+                                    errors.contract && (
+                                    <Typography color="error" variant="caption">
+                                      Invalid Contract Address
+                                    </Typography>
+                                    )
+                                }
             </GridItem>
           </GridRow>
           <GridRow spacing={5} className={classes.gridRow}>
@@ -181,8 +186,15 @@ const NotificationEventCreate: FC<Props> = ({
                   variant="outlined"
                 >
                   {
-          events.map((event) => <MenuItem key={event.name} value={event.name}>{event.name}</MenuItem>)
-        }
+                                            events.map((event) => (
+                                              <MenuItem
+                                                key={event.name}
+                                                value={event.name}
+                                              >
+                                                {event.name}
+                                              </MenuItem>
+                                            ))
+                                        }
                 </Select>
               </Box>
             </GridItem>

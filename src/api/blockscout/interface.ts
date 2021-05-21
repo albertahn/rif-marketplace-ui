@@ -15,4 +15,4 @@ export type ContractABIItem = {
     anonymous?: boolean
 }
 
-export type ContractABIEvent = Omit<ContractABIItem, 'type'|'outputs'|'payable'|'stateMutability'|'constant'>
+export type ContractABIEvent = Pick<ContractABIItem, 'name' | 'inputs' | 'anonymous'>

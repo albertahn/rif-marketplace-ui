@@ -1,10 +1,10 @@
-import { SupportedEvent, SupportedEventChannel } from 'config/notifier'
+import { SupportedEventType, SupportedEventChannel } from 'config/notifier'
 
 export const notifierChannelPlaceHolder: Record<SupportedEventChannel, string> = {
   API: 'Enter api destination',
 }
 
-export const notifierEventTypeLabels: Record<SupportedEvent, string> = {
+export const notifierEventTypeLabels: Record<SupportedEventType, string> = {
   SMARTCONTRACT: 'Smart Contract',
   NEWBLOCK: 'New Block',
 }

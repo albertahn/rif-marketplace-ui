@@ -20,7 +20,7 @@ import { createStyles, Theme } from '@material-ui/core/styles'
 import NotificationEventCreate from 'components/organisms/notifier/NotificationEventCreate'
 import { NotifierEvent, NotifierEventParam } from 'models/marketItems/NotifierItem'
 import Box from '@material-ui/core/Box'
-import { SupportedEvent } from 'config/notifier'
+import { SUPPORTED_EVENTS } from 'config/notifier'
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
 
@@ -37,9 +37,9 @@ const eventHeaders = {
 } as const
 
 type EventItem = {
-  [K in keyof Omit<typeof eventHeaders, 'actions'>]: string
+    [K in keyof Omit<typeof eventHeaders, 'actions'>]: string
 } & {
-  signature: string
+    signature: string
 }
 
 const buildEventSignature = (notifierEvent: NotifierEvent): string => `${notifierEvent.name}(${notifierEvent?.params?.map((input: NotifierEventParam) => `${input.name} ${input.type}`).join(',')})`
@@ -69,16 +69,15 @@ const NotifierOffersSelectedPage: FC = () => {
   const [key, setKey] = useState<number>(0)
 
   const addNotifierEvent = (notifierEvent: NotifierEvent): void => {
-    if (notifierEvent.type === 'NEWBLOCK' as SupportedEvent && events.find((addedEvent) => addedEvent.type === 'NEWBLOCK' as SupportedEvent)) {
+    if (notifierEvent.type === SUPPORTED_EVENTS.NEWBLOCK && events.find((addedEvent) => addedEvent.type === SUPPORTED_EVENTS.NEWBLOCK)) {
       setAddEventCollapsed(!addEventCollapsed)
       return
     }
     setEvents([
       ...events, {
-        // id: notifierEvent.name as string,
-        name: notifierEvent.type === 'NEWBLOCK' as SupportedEvent ? 'NEWBLOCK' : notifierEvent.name as string,
+        name: notifierEvent.type === SUPPORTED_EVENTS.NEWBLOCK ? SUPPORTED_EVENTS.NEWBLOCK : notifierEvent.name as string,
         type: notifierEvent.type,
-        signature: notifierEvent.type === 'NEWBLOCK' as SupportedEvent ? '' : buildEventSignature(notifierEvent) as string,
+        signature: notifierEvent.type === SUPPORTED_EVENTS.NEWBLOCK ? '' : buildEventSignature(notifierEvent) as string,
         channels: notifierEvent.channels.map((channel) => channel.type).join('+'),
       },
     ])
