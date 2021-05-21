@@ -34,19 +34,19 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 type Inputs = {
-    contract: string
+  contract: string
 }
 
 type Props = {
-    onAddEvent: (event: NotifierEvent) => void
-    channels?: Array<SupportedEventChannel>
+  onAddEvent: (event: NotifierEvent) => void
+  channels?: Array<SupportedEventChannel>
 }
 
 type EventData = {
-    contract: string
-    event: ContractABIEvent
-    eventType: SupportedEventType
-    addedChannels: Array<NotifierChannel>
+  contract: string
+  event: ContractABIEvent
+  eventType: SupportedEventType
+  addedChannels: Array<NotifierChannel>
 }
 
 const NotificationEventCreate: FC<Props> = ({
@@ -110,6 +110,8 @@ const NotificationEventCreate: FC<Props> = ({
     }
   }
 
+  // const defaultEvent: string = events.length ? events[0].name : ''
+
   return (
     <form>
       <Grid container spacing={4}>
@@ -124,82 +126,82 @@ const NotificationEventCreate: FC<Props> = ({
             <Select
               name="eventType"
               onChange={handleEventTypeChange}
-              value={eventData?.eventType ?? SUPPORTED_EVENTS.SMARTCONTRACT}
+              value={eventData.eventType ?? SUPPORTED_EVENTS.SMARTCONTRACT}
               variant="outlined"
               className={classes.select}
               id="event-type-select"
             >
               {
-                                SUPPORTED_EVENT_TYPES.map((eventType) => (
-                                  <MenuItem
-                                    key={eventType}
-                                    value={eventType}
-                                  >
-                                    {notifierEventTypeLabels[eventType]}
-                                  </MenuItem>
-                                ))
-                            }
+                  SUPPORTED_EVENT_TYPES.map((eventType) => (
+                    <MenuItem
+                      key={eventType}
+                      value={eventType}
+                    >
+                      {notifierEventTypeLabels[eventType]}
+                    </MenuItem>
+                  ))
+                }
             </Select>
           </GridItem>
         </GridRow>
         {eventData.eventType === SUPPORTED_EVENTS.SMARTCONTRACT && (
-        <>
-          <GridRow spacing={4} className={classes.gridRow}>
-            <GridItem>
-              <Typography gutterBottom color="secondary" variant="body2">
-                Smart Contract
-              </Typography>
-            </GridItem>
-            <GridItem>
-              <TextField
-                name="contract"
-                inputRef={register({ required: true })}
-                onChange={handleContractChange}
-                variant="outlined"
-                InputProps={{
-                  style: { width: 400, height: 40 },
-                }}
-              />
-              {
-                                    errors.contract && (
-                                    <Typography color="error" variant="caption">
-                                      Invalid Contract Address
-                                    </Typography>
-                                    )
-                                }
-            </GridItem>
-          </GridRow>
-          <GridRow spacing={5} className={classes.gridRow}>
-            <GridItem>
-              <Typography gutterBottom color="secondary" variant="body2">
-                Event
-              </Typography>
-            </GridItem>
-            <GridItem>
-              <Box pl={7}>
-                <Select
-                  name="eventName"
-                  onChange={handleEventChange}
-                  value={eventData?.event?.name || (events.length ? events[0].name : '')}
-                  className={classes.select}
-                  id="event"
+          <>
+            <GridRow spacing={4} className={classes.gridRow}>
+              <GridItem>
+                <Typography gutterBottom color="secondary" variant="body2">
+                  Smart Contract
+                </Typography>
+              </GridItem>
+              <GridItem>
+                <TextField
+                  name="contract"
+                  inputRef={register({ required: true })}
+                  onChange={handleContractChange}
                   variant="outlined"
-                >
-                  {
-                                            events.map((event) => (
-                                              <MenuItem
-                                                key={event.name}
-                                                value={event.name}
-                                              >
-                                                {event.name}
-                                              </MenuItem>
-                                            ))
-                                        }
-                </Select>
-              </Box>
-            </GridItem>
-          </GridRow>
-        </>
+                  InputProps={{
+                    style: { width: 400, height: 40 },
+                  }}
+                />
+                {
+                      errors.contract && (
+                      <Typography color="error" variant="caption">
+                        Invalid Contract Address
+                      </Typography>
+                      )
+                    }
+              </GridItem>
+            </GridRow>
+            <GridRow spacing={5} className={classes.gridRow}>
+              <GridItem>
+                <Typography gutterBottom color="secondary" variant="body2">
+                  Event
+                </Typography>
+              </GridItem>
+              <GridItem>
+                <Box pl={7}>
+                  <Select
+                    name="eventName"
+                    onChange={handleEventChange}
+                    value={eventData.event?.name || ''}
+                    className={classes.select}
+                    id="event"
+                    variant="outlined"
+                  >
+                    {
+                          events.map((event) => (
+                            <MenuItem
+                              key={event.name}
+                              value={event.name}
+                            >
+                              {event.name}
+                            </MenuItem>
+                          ))
+                        }
+                  </Select>
+                </Box>
+              </GridItem>
+            </GridRow>
+          </>
         )}
       </Grid>
       <Grid>
